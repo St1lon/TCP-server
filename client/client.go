@@ -31,7 +31,7 @@ func main() {
 	if err != nil {
 		log.Printf("Could not receive data sent from server: %v", err.Error())
 	}
-	if string(recievedBuffer[:n]) != "OK" {
+	if string(recievedBuffer[:n]) != "OK\n" {
 		log.Print("The message is not OK")
 	}
 	log.Printf("Recieved Message: %v", string(recievedBuffer))

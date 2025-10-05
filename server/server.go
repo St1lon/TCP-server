@@ -30,7 +30,7 @@ func handleRequests(conn net.Conn) {
 	log.Println("New client connected")
 
 	// Небольшая задержка, чтобы убедиться, что клиент готов
-	responseString := "OK"
+	responseString := "OK\n"
 	_, err := conn.Write([]byte(responseString))
 	if err != nil {
 		log.Printf("Error writing to connection: %v", err)
