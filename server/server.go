@@ -5,40 +5,48 @@ import (
 	"net"
 )
 
+const (
+	HOST = "localhost"
+	PORT = "8080"
+	TYPE = "tcp"
+)
+
 func main() {
-	// Слушаем порт 8080
-	listener, err := net.Listen("tcp", ":8080")
-	if err != nil {
-		log.Fatalf("Error starting server: %v", err)
-	}
-	defer listener.Close()
-	
-	log.Println("Server listening on port 8080")
-	
-	// Бесконечный цикл для принятия подключений
+	log.Println("Starting TCPserver")
+	listen, err := net.Listen(TYPE, HOST+":"+PORT)
+	handleErrors(err)
+	defer listen.Close()
+
 	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Printf("Error accepting connection: %v", err)
-			continue
-		}
-		
-		// Обрабатываем подключение в горутине
-		go handleConnection(conn)
+		conn, err := listen.Accept()
+		handleErrors(err)
+		go handleRequests(conn)
 	}
 }
 
-func handleConnection(conn net.Conn) {
+func handleRequests(conn net.Conn) {
 	defer conn.Close()
-	
-	// Отправляем "OK\n" клиенту
-	_, err := conn.Write([]byte("OK\n"))
+
+	log.Println("New client connected")
+
+	// Небольшая задержка, чтобы убедиться, что клиент готов
+	responseString := "OK"
+	_, err := conn.Write([]byte(responseString))
 	if err != nil {
 		log.Printf("Error writing to connection: %v", err)
 		return
 	}
-	
-	// Логируем успешную обработку
-	remoteAddr := conn.RemoteAddr().String()
-	log.Printf("Sent 'OK\\n' to client %s and closed connection", remoteAddr)
+
+	log.Println("Response sent to client, closing connection")
+}
+
+func handleClientErrors(err error) {
+	if err != nil {
+		log.Println(err)
+	}
+}
+func handleErrors(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }
